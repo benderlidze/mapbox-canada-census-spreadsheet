@@ -395,7 +395,7 @@
 
             map.on('click', 'pins', (e) => {
                 // Copy coordinates array.
-                const coordinates = [+e.features[0].properties['LONGITUDE'], +e.features[0].properties['LATITUDE']];
+                const coordinates = [+e.features[0].properties['lon'], +e.features[0].properties['lat']];
                 const data = e.features[0].properties;
 
                 console.log('e', coordinates);
@@ -404,40 +404,12 @@
                 // Ensure that if the map is zoomed out such that multiple
                 // copies of the feature are visible, the popup appears
                 // over the copy being pointed to.
-
-                const info = [
-                    'CONTACT',
-                    'CITY',
-                    'DIMENSION',
-                    'PAST EXHIBITIONS',
-                    'PARTNERS',
-                    'INFO'
-                ]
-
-                const infoData = Object.entries(data).filter(d => d[1] && d[1] !== "" && info.includes(d[0])).map(d => {
-                    return `<div>${d[0]}: ${d['1']}</div>`
-                }).join("")
                 const description = `
                     <div style="padding:15px;overflow:hidden">
-                        <h2>${data['NAME VENUE']}</h2>
-                        <h3>${data['VENUE TYPE']}</h3>
-
                         <table class="table">
                             <tr>
                                 <td>ADDRESS</td>
-                                <td>${data['ADDRESS']}</td>
-                            </tr>
-                            <tr>
-                                <td>WEBSITE</td>
-                                <td><a style="color:inherit; text-decoration:none" href="${data['WEBSITE']}" target="_blank">${data['WEBSITE']}</a></td>
-                            </tr>
-                            <tr>
-                                <td>CONTACT</td>
-                                <td>${data['CONTACT']}</td>
-                            </tr>
-                            <tr>
-                                <td>CITY</td>
-                                <td>${data['CITY']}</td>
+                                <td>${data['Address 1']}</td>
                             </tr>
                         </table>
                     </div>
@@ -448,16 +420,11 @@
                     .setHTML(description)
                     .addTo(map);
 
-                map.flyTo({
-                    center: coordinates,
-                    zoom: 14
-                });
+                // map.flyTo({
+                //     center: coordinates,
+                //     zoom: 14
+                // });
             });
-
-            map.on("zoom", () => {
-                const zoom = map.getZoom()
-                main.cityMarkers.forEach(d => zoom > 10 ? d.remove() : d.addTo(map))
-            })
 
             map.on('mouseenter', 'pins', () => {
                 map.getCanvas().style.cursor = 'pointer';
@@ -482,108 +449,6 @@
             // });
         });
 
-        function fillDropDown(data, action) {
-            console.log('data', data);
-            const selectList = document.createElement("select");
-            selectList.id = "mySelect";
-            infoDiv.appendChild(selectList)
-            selectList.addEventListener("change", d => {
-                const id = selectList.value
-                if (typeof action === "function") {
-                    action(id)
-                }
-            })
-            data
-                .sort((a, b) => a.localeCompare(b))
-                .map(p => {
-                    const option = document.createElement("option");
-                    option.value = p;
-                    option.text = p;
-                    selectList.appendChild(option);
-                })
-
-        }
-
-        function buildSwitcher(labelText, action, checked = true) {
-
-            const div = document.createElement("div")
-            div.className = "switcher-div"
-
-            const label = document.createElement("label")
-            label.className = "switch"
-
-            const checkbox = document.createElement("input")
-            checkbox.type = "checkbox"
-            checkbox.className = "checkbox"
-            checkbox.checked = checked
-            checkbox.addEventListener("input", () => {
-                if (typeof action === "function") {
-                    action(checkbox.checked)
-                }
-            })
-
-            const span = document.createElement("span")
-            span.className = "slider round"
-
-            const pinColor = colors.find(d => d.name.toLowerCase() === labelText.toLowerCase())
-
-            // const color = document.createElement("div")
-            // color.style.width = "10px"
-            // color.style.height = "10px"
-            // color.style.backgroundColor = bgColor
-
-            const bgColor = pinColor ? pinColor.color : "black"
-            const bgFontColor = pinColor ? pinColor.fontColor : "black"
-            document.body.appendChild(Object.assign(document.createElement("style"), {
-                textContent: `
-                .${bgColor}:before {background-color: ${bgColor} !important}
-                .${bgColor} .mapboxgl-popup-content {background-color: ${bgColor} !important; color: ${bgFontColor} !important}
-                .${bgColor} .mapboxgl-popup-tip {border: none !important}
-                .${bgColor} .mapboxgl-popup-close-button {font-size: 34px; font-family: serif; color: ${bgFontColor} !important}
-                `
-            }))
-            span.classList.add(bgColor)
-
-            const text = document.createElement("div")
-            text.innerText = pinColor && pinColor.displayName ? pinColor.displayName : labelText
-
-            label.appendChild(checkbox)
-            label.appendChild(span)
-
-            div.appendChild(label)
-            div.appendChild(text)
-
-
-            return div
-        }
-
-
-
-        function replaceAccentedCharacters(str) {
-            let accentedChars = {
-                'á': 'a',
-                'à': 'a',
-                'ã': 'a',
-                'â': 'a',
-                'é': 'e',
-                'è': 'e',
-                'ê': 'e',
-                'í': 'i',
-                'ì': 'i',
-                'î': 'i',
-                'ó': 'o',
-                'ò': 'o',
-                'õ': 'o',
-                'ô': 'o',
-                'ú': 'u',
-                'ù': 'u',
-                'û': 'u',
-                'ç': 'c'
-            };
-            return str.replace(/[áàãâéèêíìîóòõôúùûç]/gi, function (matched) {
-                return accentedChars[matched];
-            });
-        }
 
     </script>
 
